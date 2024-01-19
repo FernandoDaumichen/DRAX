@@ -1,113 +1,267 @@
-import Image from 'next/image'
+"use client";
+import React, { useState, useRef } from "react";
+import DeezerAPI from "../components/DeezerAPI";
+import SearchBar from "../components/SearchBar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+
+import Link from "next/link";
+import Image from "next/image";
+
+interface DeezerApiResponse {
+  data: {
+    id: number;
+    title: string;
+    artist: {
+      name: string;
+    };
+    album: {
+      cover: string;
+      title: string;
+    };
+    preview: string;
+  }[];
+}
+
+function debounce(func: (...args: any[]) => void, timeout = 300) {
+  let timer: ReturnType<typeof setTimeout>;
+  return (...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, timeout);
+  };
+}
+type Song = {
+  id: number;
+  title: string;
+  link?: string;
+  preview: string;
+};
+
+const playSong = (song: Song) => {
+  window.open(song.link, "_blank");
+};
 
 export default function Home() {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [data, setData] = useState<DeezerApiResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPlaying, setCurrentPlaying] = useState<string>("");
+  const [isTyping, setIsTyping] = useState(false);
+  
+  const [initialLogoDisplayed, setInitialLogoDisplayed] = useState(true);
+
+
+  const debouncedSearch = debounce(() => {
+    handleSearchSubmit();
+    setIsTyping(false);
+  }, 300);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setIsTyping(true);
+    debouncedSearch();
+  };
+  const handleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleSearchSubmit = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    const DEEZER_API_ENDPOINT =
+      "https://deezerdevs-deezer.p.rapidapi.com/search";
+    const API_KEY = "ee75c3cc9dmsha7e377714a18573p11f471jsn38c6ba464127";
+    try {
+      const response = await fetch(
+        `${DEEZER_API_ENDPOINT}?q=${encodeURIComponent(searchQuery)}`,
+        {
+          headers: {
+            "X-RapidAPI-Key": API_KEY,
+            "X-RapidAPI-Host": "deezerdevs-deezer.p.rapidapi.com",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const [playingSongId, setPlayingSongId] = useState<number | null>(null);
+  const audioRefs = useRef<{ [id: number]: HTMLAudioElement }>({});
+
+  const togglePlayPause = (song: Song) => {
+    if (!audioRefs.current[song.id]) {
+      audioRefs.current[song.id] = new Audio(song.preview);
+    }
+
+    const isCurrentSongPlaying = playingSongId === song.id;
+    if (isCurrentSongPlaying && !audioRefs.current[song.id].paused) {
+      audioRefs.current[song.id].pause();
+      setPlayingSongId(null);
+    } else {
+      Object.values(audioRefs.current).forEach((audio) => audio.pause());
+      audioRefs.current[song.id].play();
+      setPlayingSongId(song.id);
+    }
+  };
+
+  const playSong = (previewUrl: string) => {
+    const audio = new Audio(previewUrl);
+    audio.play();
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+  <div  className="coal " style={{ minHeight: "100vh" }}>
+      {initialLogoDisplayed && (
+        <div
+          className="initial-logo"
+          onAnimationEnd={() => setInitialLogoDisplayed(false)}
+        >
+          <Image
+            src="/images/DRAXOG.png"
+            alt="Large DRAX Logo"
+            width={500}
+            height={150}
+            className="mb-4"
+          />
         </div>
-      </div>
+      )}
+    {!initialLogoDisplayed && (
+      <>
+        <header className="App-header p-4 shadow-lg bg-purple">
+          <div className="flex items-center justify-between">
+            <div className="flex-1"></div>
+            <div className="flex-1 flex justify-center">
+              <Image
+                src="/images/DRAX.png"
+                alt="DRAX Logo"
+                width={200}
+                height={60}
+                className="mb-4"
+              />
+            </div>
+            <div onClick={handleDropdown} className="flex-1 flex justify-end">
+              API Status
+              {showDropdown && <DeezerAPI />}
+            </div>
+          </div>
+        </header>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+
+        <div className="top-songs-label">
+          <div className="flex items-center justify-center text-gray-200 mb-6 mt-6">
+
+            <Image
+              src="/images/fire.svg" 
+              alt="Fire Emoji"
+              width={40}
+              height={40}
+            />
+
+
+            <h1 className="text-5xl mx-2">Top Songs</h1>
+
+        
+            <Image
+              src="/images/fire.svg" 
+              alt="Fire Emoji"
+              width={40}
+              height={40}
+            />
+          </div>
+
+          <iframe
+            title="deezer-widget"
+            src="https://widget.deezer.com/widget/auto/playlist/1479458365"
+            width="100%"
+            height="300"
+            frameBorder="0"
+            allowTransparency
+            allow="encrypted-media; clipboard-write"
+            className="deezer-widget"
+          ></iframe>
+        </div>
+
+        <SearchBar
+          onSearchSubmit={handleSearchSubmit}
+          onSearchChange={handleSearchChange}
         />
-      </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+        {isLoading && <div className="loading-indicator">Loading...</div>}
+        {error && (
+          <div className="error-message text-red-600">Error: {error}</div>
+        )}
+        {!data && !isLoading && (
+          <p className="search-prompt text-lg">Search your favorite songs...</p>
+        )}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+        {data && data.data && Array.isArray(data.data) && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.data.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-lg shadow-md p-4 flex items-center space-x-4"
+                style={{ backgroundColor: "#6C53B9", color: "white" }}
+              >
+                <div className="flex-shrink-0">
+                  <Image
+                    src={item.album.cover}
+                    alt={`Album cover of ${item.album.title}`}
+                    width={100}
+                    height={100}
+                    className="rounded"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <h3 className="text-lg  text-blue-600 dark:text-blue-400">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Artist: {item.artist.name}
+                  </p>
+                  <button
+                    className="button mt-2 py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => togglePlayPause(item)}
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        playingSongId === item.id &&
+                          !audioRefs.current[item.id]?.paused
+                          ? faPause
+                          : faPlay
+                      }
+                    />
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+                  </button>
+                </div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+              </div>
+            ))}
+
+
+          </div>
+        )}
+
+      </>
+
+    )}
+
+  </div>
+  );
 }
