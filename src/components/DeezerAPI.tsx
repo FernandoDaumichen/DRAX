@@ -15,11 +15,17 @@ const DeezerAPI: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const url = 'https://deezerdevs-deezer.p.rapidapi.com/infos';
+            const API_KEY = process.env.NEXT_PUBLIC_DEEZER_API_KEY as string;
+            if (!API_KEY) {
+                console.error('API key is not defined');
+                setError('API key is not defined');
+                return;
+            }
             const options = {
                 method: 'GET',
                 headers: {
-                    'X-RapidAPI-Key': 'ee75c3cc9dmsha7e377714a18573p11f471jsn38c6ba464127', // Replace with your actual API key
-    'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
+                    'X-RapidAPI-Key': API_KEY,
+                    'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
                 }
             };
     
@@ -45,10 +51,9 @@ const DeezerAPI: React.FC = () => {
             {error && <p>Something went wrong: {error}</p>}
             {data && (
                 <div>
-                    <h2>Deezer API Response</h2>
-                    <p>Country: {data.country}</p>
-                    <p>Is Service Open: {data.open ? 'Yes' : 'No'}</p>
-                    <p>Preferred Pop: {data.pop}</p>
+                    <h2 className='flex justify-center items-center text-white vibrant-pink'>Deezer API Response</h2>
+                    <p className='text-white'>Country: {data.country}</p>
+                    <p className='text-white'>Is Service Open: {data.open ? 'Yes' : 'No'}</p>
                    
                 </div>
             )}

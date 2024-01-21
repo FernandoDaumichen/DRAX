@@ -1,70 +1,94 @@
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-  @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Kanit&display=swap");
 
+:root {
+  --purple-color: 91, 66, 170; /* #6C53B9 */
+
+  --dark-blue-color: 1, 0, 5; /* #010005 */
+  --vibrant-pink-color: 222, 43, 171; /* #DE2BAB */
+  --coal: 25, 25, 25;
+
+  --white: 227, 227, 227;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 227, 227, 227;
+  --background-end-rgb: 227, 227, 227;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --purple-color: 91,66,170; /* #6C53B9 */
-    
-    --dark-blue-color: 1, 0, 5;    /* #010005 */
-    --vibrant-pink-color: 222, 43, 171; /* #DE2BAB */
-    --coal: 25,25,25;
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+    --background-start-rgb: 38, 38, 38;
+    --background-end-rgb: 38, 38, 38;
   }
+}
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
 
+.initial-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  animation: shrinkLogo 4s forwards;
+}
 
-  body {
-    color: rgb(var(--foreground-rgb));
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb));
+@keyframes shrinkLogo {
+  0% {
+    transform: translate(0, 0) scale(1); /* Start position */
+    opacity: 1;
   }
-
-  .initial-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 90vh;
-    animation: shrinkLogo 4s forwards; 
+  100% {
+    transform: translate(0, -51vh) scale(0.4); /* End position and scale */
+    opacity: 0.5;
   }
+}
 
-  @keyframes shrinkLogo {
-    0% {
-      transform: translate(0, 0) scale(1); /* Start position */
-      opacity: 1;
-    }
-    100% {
-      transform: translate(0, -51vh) scale(0.4); /* End position and scale */
-      opacity: 0.5;
-    }
-  }
-  
-  .bg-purple {
-    background-color: rgba(var(--purple-color), 1); 
+.bg-purple {
+  background-color: rgba(var(--purple-color), 1);
+}
+
+.vibrant-pink {
+  background-color: rgb(var(--vibrant-pink-color), 1);
+}
+
+.dark-blue- {
+  background-color: rgb(var(--dark-blue-color), 1);
+}
+
+.coal {
+  background-color: rgb(var(--coal), 1);
+  background-color: rgb(38, 38, 38);
+}
+
+.white {
+  background-color: rgb(var(--white), 1);
+  background-color: rgb(227, 227, 227);
+}
+
+.pixel{
+  font-family: 'Pixelify Sans', sans-serif;
 
 }
 
-  .vibrant-pink {
-    background-color: rgb(var(--vibrant-pink-color), 1);
-  }
+.vibrant-pink-text {
+color: rgb(var(--vibrant-pink-color), 1);
+}
 
-  .dark-blue- {
-    background-color: rgb(var(--dark-blue-color),1);
-  }
+p {
+  font-family: "Kanit", sans-serif;
+}
 
-  .coal {
-    background-color: rgb(var(--coal),1);
-  }
-
-  p {
-    font-family: 'Kanit', sans-serif;  }
-
-    h1{
-
-      font-family: 'Kanit', sans-serif;
-    }
+h1 {
+  font-family: "Kanit", sans-serif;
+}
+h2 {
+  font-family: "Kanit", sans-serif;
+}
