@@ -92,7 +92,7 @@ export default function Home() {
 
     const DEEZER_API_ENDPOINT =
       "https://deezerdevs-deezer.p.rapidapi.com/search";
-      const API_KEY = process.env.NEXT_PUBLIC_DEEZER_API_KEY as string;
+      const API_KEY = process.env.DEEZER_API as string;
 
     try {
       const response = await fetch(

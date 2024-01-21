@@ -15,7 +15,7 @@ const DeezerAPI: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const url = 'https://deezerdevs-deezer.p.rapidapi.com/infos';
-            const API_KEY = process.env.NEXT_PUBLIC_DEEZER_API_KEY as string;
+            const API_KEY = process.env.DEEZER_API as string;
             if (!API_KEY) {
                 console.error('API key is not defined');
                 setError('API key is not defined');
