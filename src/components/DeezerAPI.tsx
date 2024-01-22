@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 type DeezerApiResponse = {
-    // Replace with actual response structure
+
     country: string;
     open: boolean;
     pop: string;
-    // other fields...
+
 };
 
 const DeezerAPI: React.FC = () => {
@@ -15,7 +15,7 @@ const DeezerAPI: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const url = 'https://deezerdevs-deezer.p.rapidapi.com/infos';
-            const API_KEY = process.env.DEEZER_API as string;
+            const API_KEY = process.env.NEXT_PUBLIC_DEEZER_API;
             if (!API_KEY) {
                 console.error('API key is not defined');
                 setError('API key is not defined');
@@ -28,7 +28,7 @@ const DeezerAPI: React.FC = () => {
                     'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
                 }
             };
-    
+
             try {
                 const response = await fetch(url, options);
                 if (!response.ok) {
@@ -41,10 +41,9 @@ const DeezerAPI: React.FC = () => {
                 setError('Failed to fetch data. Please check the console for more details.');
             }
         };
-    
+
         fetchData();
     }, []);
-    
 
     return (
         <div>
@@ -54,7 +53,6 @@ const DeezerAPI: React.FC = () => {
                     <h2 className='flex justify-center items-center text-white vibrant-pink'>Deezer API Response</h2>
                     <p className='text-white'>Country: {data.country}</p>
                     <p className='text-white'>Is Service Open: {data.open ? 'Yes' : 'No'}</p>
-                   
                 </div>
             )}
         </div>

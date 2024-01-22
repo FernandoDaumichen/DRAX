@@ -8,8 +8,6 @@ import kirby from "/public/images/moi.gif";
 import Link from "next/link";
 import Image from "next/image";
 
-
-
 interface DeezerApiResponse {
   data: {
     id: number;
@@ -85,28 +83,33 @@ export default function Home() {
   const handleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-
   const handleSearchSubmit = async () => {
     setIsLoading(true);
     setError(null);
-
-    const DEEZER_API_ENDPOINT =
-      "https://deezerdevs-deezer.p.rapidapi.com/search";
-      const API_KEY = process.env.DEEZER_API as string;
-
+  
+    const DEEZER_API_ENDPOINT = "https://deezerdevs-deezer.p.rapidapi.com/search";
+    const API_KEY = process.env.NEXT_PUBLIC_DEEZER_API;
+  
+    if (!API_KEY) {
+      setError('API key is undefined');
+      setIsLoading(false);
+      return;
+    }
+  
     try {
       const response = await fetch(
         `${DEEZER_API_ENDPOINT}?q=${encodeURIComponent(searchQuery)}`,
         {
-          headers: {
+          headers: new Headers({
             "X-RapidAPI-Key": API_KEY,
             "X-RapidAPI-Host": "deezerdevs-deezer.p.rapidapi.com",
-          },
+          }),
         }
       );
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      } 
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -293,3 +296,4 @@ export default function Home() {
     </div>
   );
 }
+
