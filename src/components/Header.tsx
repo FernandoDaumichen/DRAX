@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import DeezerAPI from './DeezerAPI';
-
+import Waveform from './Audio';
 interface HeaderProps {
   showDropdown: boolean;
   setShowDropdown: (show: boolean) => void;
@@ -8,9 +8,11 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ showDropdown, setShowDropdown, dropdownRef }) => (
-    <header className="App-header p-4 shadow-lg bg-purple">
+  <header className="App-header p-4 shadow-lg bg-purple">
     <div className="flex items-center justify-between">
-      <div className="flex-1"></div>
+      <div className="flex-1 flex items-center"> 
+        <Waveform numBars={8} />
+      </div>
       <div className="flex-1 flex justify-center">
         <Image
           src="/images/DRAX.png"
@@ -35,7 +37,8 @@ const Header: React.FC<HeaderProps> = ({ showDropdown, setShowDropdown, dropdown
         )}
       </div>
     </div>
-    </header>
+  </header>
 );
+
 
 export default Header;
