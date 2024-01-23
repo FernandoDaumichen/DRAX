@@ -1,18 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import DeezerAPI from "../components/DeezerAPI";
-import SearchBar from "../components/SearchBar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 import kirby from "/public/images/moi.gif";
-import Link from "next/link";
 import Image from "next/image";
-import CircularProgress from "@mui/material/CircularProgress";
 import debounce from "@/utils/debounce";
 import SongList from "../components/SongList";
 import LoadingIndicator from "../components/LoadingIndicator";
 import ErrorMessage from "../components/ErrorMessage";
 import Header from "../components/Header";
+import SearchBar from "../components/SearchBar";
 
 interface DeezerApiResponse {
   data: {
@@ -73,10 +68,19 @@ export default function Home() {
   }, 300);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setIsTyping(true);
-    debouncedSearch();
+    const query = e.target.value;
+    setSearchQuery(query);
+    console.log("Search Query:", query);
+
+    if (query === "") {
+      setData(null);
+      console.log("Data reset to null");
+    } else {
+      setIsTyping(true);
+      debouncedSearch();
+    }
   };
+
   const handleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
@@ -105,11 +109,11 @@ export default function Home() {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      setData(result);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setData(result);
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -208,7 +212,8 @@ export default function Home() {
 
           {isLoading && <LoadingIndicator />}
           {error && <ErrorMessage message={error} />}
-          {!data && !isLoading && (
+
+          {!searchQuery && !data && !isLoading && (
             <div className="flex flex-col items-center justify-center mt-2">
               <h2 className="text-5xl pixel text-center text-gray-600 dark:text-gray-300 mb-0">
                 Search for a song
