@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
 type BarProps = {
-  height: number; // The target height of the bar
+  height: number; 
 };
 
 const AnimatedBar: React.FC<BarProps> = ({ height }) => {
@@ -14,41 +14,37 @@ const AnimatedBar: React.FC<BarProps> = ({ height }) => {
 
   return (
     <animated.div
-      className="bg-purple-400" // Using Tailwind CSS for purple background
+      className="bg-purple-400"
       style={{
         ...animationStyle,
         width: '10px',
         margin: '0 2px',
-        height: animationStyle.height.to(h => `${h}px`), // Use pixels for direct control
+        height: animationStyle.height.to(h => `${h}px`),
       }}
     />
   );
 };
 
 type WaveformProps = {
-  numBars: number; // Number of bars in the waveform
+  numBars: number; 
 };
 
 const Waveform: React.FC<WaveformProps> = ({ numBars }) => {
   const [barHeights, setBarHeights] = useState<number[]>([]);
 
-  // Function to generate heights that are larger
   const generateHeights = () => {
-    // Ensuring that bars are always at least 80% of the container height
-    return Array.from({ length: numBars }, () => 30 + Math.random() * 50); // Heights will range from 80 to 100%
+    return Array.from({ length: numBars }, () => 30 + Math.random() * 50); 
   };
-
-  // Update the bar heights at a regular interval
   useEffect(() => {
     const interval = setInterval(() => {
       setBarHeights(generateHeights());
-    }, 500); // Update interval remains the same
+    }, 500); 
 
     return () => clearInterval(interval);
   }, [numBars]);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', height: '100px' }}> {/* Adjusted for visual appeal */}
+    <div style={{ display: 'flex', alignItems: 'flex-end', height: '100px' }}> 
       {barHeights.map((height, index) => (
         <AnimatedBar key={index} height={height} />
       ))}

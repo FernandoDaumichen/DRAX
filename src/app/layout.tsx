@@ -17,7 +17,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* <meta http-equiv="Permissions-Policy" content="accelerometer=(), gyroscope=()"></meta> */}
       <body className={inter.className}>{children}</body>
     </html>
   )
