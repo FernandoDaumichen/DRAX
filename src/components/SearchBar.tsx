@@ -8,6 +8,8 @@ type SearchBarProps = {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearchSubmit, onSearchChange }) => {
   const [query, setQuery] = useState('');
 
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSearchSubmit();

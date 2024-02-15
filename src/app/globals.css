@@ -55,6 +55,11 @@ body {
   background-color: rgba(var(--purple-color), 1);
 }
 
+.pink {
+  color: rgba(var(--vibrant-pink-color), 1);
+  background-color: rgb(var(--vibrant-pink-color), 1);
+}
+
 .vibrant-pink {
   background-color: rgb(var(--vibrant-pink-color), 1);
 }
@@ -91,4 +96,14 @@ h1 {
 }
 h2 {
   font-family: "Kanit", sans-serif;
+}
+
+@font-face {
+  font-family: 'Name Smile';
+  src: url('/Name Smile.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/PixelifySans-VariableFont_wght.ttf') format('truetype');
 }
