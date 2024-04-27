@@ -4,7 +4,6 @@ const nextConfig = {}
 module.exports = {
     images: {
       domains: ['api.deezer.com'], 
-      
     },
     nextConfig,
     }

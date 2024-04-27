@@ -18,6 +18,7 @@ interface SongListProps {
   songs: Song[];
   playingSongId: number | null;
   audioRefs: React.MutableRefObject<AudioRefs>;
+  togglePlayPause: (song: Song) => void;
 }
 
 interface ProgressMap {
@@ -38,7 +39,8 @@ const SongList: React.FC<SongListProps> = ({
       songs.forEach((song) => {
         const audio = audioRefs.current[song.id];
         if (audio) {
-          newProgress[song.id] = (audio.currentTime / audio.duration) * 100 || 0;
+          newProgress[song.id] =
+            (audio.currentTime / audio.duration) * 100 || 0;
         }
       });
       setProgress(newProgress);
@@ -55,7 +57,10 @@ const SongList: React.FC<SongListProps> = ({
 
   const toggleLoop = (songId: number) => {
     setLoopStatus((prevLoopStatus) => {
-      const newLoopStatus = { ...prevLoopStatus, [songId]: !prevLoopStatus[songId] };
+      const newLoopStatus = {
+        ...prevLoopStatus,
+        [songId]: !prevLoopStatus[songId],
+      };
       const audio = audioRefs.current[songId];
       if (audio) {
         audio.loop = newLoopStatus[songId];
@@ -64,18 +69,42 @@ const SongList: React.FC<SongListProps> = ({
     });
   };
 
-  // Hypothetical togglePlayPause function
+  const [isPlaying, setIsPlaying] = useState<{ [id: number]: boolean }>({});
+
   const togglePlayPause = (song: Song) => {
-    const audio = audioRefs.current[song.id];
-    if (audio) {
-      if (audio.paused) {
-        audio.loop = loopStatus[song.id] || false; // Ensure loop status is applied
-        audio.play();
-      } else {
-        audio.pause();
-      }
+    const currentAudio = audioRefs.current[song.id];
+
+    if (!currentAudio) {
+        audioRefs.current[song.id] = new Audio(song.preview);
+        console.log("Audio element created for:", song.id);
     }
-  };
+
+    Object.keys(audioRefs.current).forEach((id) => {
+        const audio = audioRefs.current[Number(id)];
+        if (Number(id) !== song.id && !audio.paused) {
+            audio.pause();
+            setIsPlaying((prev) => ({ ...prev, [Number(id)]: false }));
+            console.log("Playback paused for:", id);
+        }
+    });
+
+    if (currentAudio) {
+        if (currentAudio.paused) {
+            currentAudio.play().then(() => {
+                setIsPlaying((prev) => ({ ...prev, [song.id]: true }));
+                console.log("Playback started for:", song.id);
+            }).catch((error) => {
+                console.error("Error during playback:", error);
+            });
+        } else {
+            currentAudio.pause();
+            setIsPlaying((prev) => ({ ...prev, [song.id]: false }));
+            console.log("Playback paused for:", song.id);
+        }
+    } else {
+        console.error("No audio element available for song ID:", song.id);
+    }
+};
 
   return (
     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -91,6 +120,7 @@ const SongList: React.FC<SongListProps> = ({
               alt={`Album cover of ${item.album.title}`}
               width={100}
               height={100}
+              unoptimized={true}
               className="rounded"
             />
           </div>
@@ -146,12 +176,7 @@ const SongList: React.FC<SongListProps> = ({
                 }}
               >
                 <FontAwesomeIcon
-                  icon={
-                    playingSongId === item.id &&
-                    !audioRefs.current[item.id]?.paused
-                      ? faPause
-                      : faPlay
-                  }
+                  icon={isPlaying[item.id] ? faPause : faPlay}
                   style={{ fontSize: "20px" }}
                 />
               </button>
